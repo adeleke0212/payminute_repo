@@ -1,10 +1,12 @@
+from utils.constants import db_tables
+from utils.helper import create_bucket
 import pandas as pd
 import psycopg2
 from sqlalchemy import create_engine
 from configparser import ConfigParser
 import boto3
 from sql import select
-from utils.helper import create_bucket
+
 
 config = ConfigParser()
 
@@ -26,11 +28,9 @@ PORT = config['DB_CRED']['port']
 
 
 # bucket_name and table_name - path to save our data in s3 bucket data lake
-
 s3_path = 's3://{}/{}.csv'  # file name in our bucket
 
 # Step 1: Create an s3 bucket using boto 3, imported from helper.py
-
 create_bucket()
 
 # Step 2: Extract our tables from the DB to the data lake
@@ -40,8 +40,7 @@ conn = create_engine(
 
 # Extract all tables to csv from DB and first load to s3 bucket
 
-db_tables = ['banks', 'cards', 'cust_verification_status',
-             'transaction_status', 'transactions', 'users', 'wallets']
+
 for table in db_tables:
     # query = f'SELECT * FROM {table}'
     df = pd.read_sql(select.query.format(table), con=conn)
