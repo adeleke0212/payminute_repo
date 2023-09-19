@@ -5,7 +5,8 @@ import psycopg2
 from sqlalchemy import create_engine
 from configparser import ConfigParser
 import boto3
-from sql import select
+from sql.query import select
+import redshift_connector
 
 
 config = ConfigParser()
@@ -28,12 +29,12 @@ PORT = config['DB_CRED']['port']
 
 
 # bucket_name and table_name - path to save our data in s3 bucket data lake
-s3_path = 's3://{}/{}.csv'  # file name in our bucket
+s3_path = 's3://{}/{}.csv'  # file name in our bucket, saving path
 
 # Step 1: Create an s3 bucket using boto 3, imported from helper.py
 create_bucket()
 
-# Step 2: Extract our tables from the DB to the data lake
+# Step 2: Extract our tables from the DB to the data lake with sqlaalchemy
 
 conn = create_engine(
     f'postgresql+psycopg2://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}')
