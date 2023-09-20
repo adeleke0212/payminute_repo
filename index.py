@@ -46,7 +46,7 @@ s3_path = 's3://{}/{}.csv'
 # Step 1: Create an s3 bucket using boto 3, imported from helper.py
 create_bucket()
 
-# Step 2: Extract our tables from the DB to the data lake with sqlaalchemy
+# Step 2: Extract tables from the DB to the data lake with sqlaalchemy
 
 conn = create_engine(
     f'postgresql+psycopg2://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}')
@@ -63,8 +63,6 @@ for table in db_tables:
         }
     )
 # Step 3: create the raw schema in DWH - you first need to connect to dwh
-# from the function, it takes conn_details as an arguement, don't forget a dict is key, value so host in quote
-
 
 conn_details = {
     'host': DWH_HOST,
@@ -86,14 +84,6 @@ for query in raw_data_tables:
     print(f"============={query[:50]}")
     cursor.execute(query)
     dwh_conn.commit()
-
-
-# ---copy all the tables from s3 data lake to DWH, using the copy command
-# we loop through the db_tables name and run the use the same sql create statemtent from
-# since we use the same table name as our query name and same name as our s3 bucket, its easy to loop through.
-# s3-path name defines above takes 2 args, so we use .format
-# Also from the copy syntax, from and iam role must be in quote
-# We also ignore the headers on the csv, delimeter is csv 1 = True
 
 # ---Copying from s3 to redshift
 for table in db_tables:
@@ -128,6 +118,16 @@ for query in transformation_queries:
     print(f"============={query[:50]}")
     cursor.execute(query)
     dwh_conn.commit()
+
+# Step 5: addtional data quality checks
+# ---we can just count no of rows in each transformed table
+staging_tables = ['dim_wallets', 'dim_dates',
+                  'dim_customer', 'dim_banks', 'ft_customer_transactions']
+
+query = 'SELECT COUNT(*) FROM staging.{}'
+for table in staging_tables:
+    cursor.execute(query.format(table))
+    print(f'Table {table} has {cursor.fetchall()} rows')
 
 cursor.close()
 conn.close()
