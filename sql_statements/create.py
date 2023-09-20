@@ -1,9 +1,10 @@
 
 # =============================================== FOR DEV SCHEMA
-# =============================================== DW RAW SCHEMA
-# raw_schema = """
-# CREATE SCHEMA IF NOT EXISTS raw_data;
-# """
+# =============================================== DW DEV/RAW SCHEMA
+create_dev_schema = """
+CREATE SCHEMA IF NOT EXISTS raw_data;
+"""
+
 banks = '''CREATE TABLE IF NOT EXISTS raw_data.banks
 (
     id integer PRIMARY KEY NOT NULL ,
@@ -174,7 +175,7 @@ CREATE TABLE IF NOT EXISTS staging.dim_banks
 );
 '''
 
-
+# These are list of assigned variables housing the queries to strings
 raw_data_tables = [banks, cards, cust_verification_status,
                    transaction_status, transactions, users, wallets]
 transformed_tables = [ft_customer_transactions,
