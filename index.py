@@ -88,6 +88,13 @@ for query in raw_data_tables:
     dwh_conn.commit()
 
 
+# ---copy all the tables from s3 data lake to DWH, using the copy command
+# we loop through the db_tables name and run the use the same sql create statemtent from
+# since we use the same table name as our query name and same name as our s3 bucket, its easy to loop through.
+# s3-path name defines above takes 2 args, so we use .format
+# Also from the copy syntax, from and iam role must be in quote
+# We also ignore the headers on the csv, delimeter is csv 1 = True
+
 # ---Copying from s3 to redshift
 for table in db_tables:
     copy_query = f"""
